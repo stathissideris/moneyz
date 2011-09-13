@@ -38,6 +38,18 @@
          (fn [[key d]] [key (dataset (:column-names statement) d)])
          (group-by :Account (:rows statement)))))
 
+(defn calculate-balance-column [statement]
+  (reverse (reductions + (reverse (map :Amount (:rows statement))))))
+
+(defn add-balance-column [statement]
+  (let [balance-column (calculate-balance-column statement)]
+    (-> statement
+        (assoc :column-names (conj (:column-names statement) :Balance))
+        (assoc :rows
+          (into [] (map
+                    (fn [row bal] (assoc row :Balance bal))
+                    (:rows statement) balance-column))))))
+
 (def d (group-by-account (merge-statements d1 d2)))
 
 ;;(view (time-series-plot (process-dates ($ :Date d)) ($ :Amount d)))
