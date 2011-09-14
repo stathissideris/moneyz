@@ -22,11 +22,11 @@
 (defn split-by-account [statement]
   (into {}
         (map
-         (fn [[key d]] [key (dataset (:column-names statement) d)])
+         (fn [[key d]] [key (dataset (:column-names statement) (sort-by :Date d))])
          (group-by :Account (:rows statement)))))
 
 (defn calculate-balance-column [statement]
-  (reverse (reductions + (reverse (map :Amount (:rows statement))))))
+  (reductions + (map :Amount (:rows statement))))
 
 (defn add-balance-column [statement]
   (let [balance-column (calculate-balance-column statement)]
